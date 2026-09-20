@@ -18,7 +18,7 @@ import { customerBalance, customersApi, invoicesApi, paymentsApi } from "@/lib/d
 import { formatINR, todayISO } from "@/lib/invoice-calc";
 import { INDIAN_STATES, type Customer } from "@/lib/types";
 
-export const Route = createFileRoute("/customers")({
+export const Route = createFileRoute("/customers/")({
   head: () => ({
     meta: [
       { title: "Customers — ShopLedger" },
