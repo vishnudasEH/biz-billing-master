@@ -1,0 +1,22 @@
+import { createFileRoute, useNavigate } from '@tanstack/react-router';
+import { useState } from 'react';
+import { toast } from 'sonner';
+import { AppShell } from '@/components/app-shell';
+import { Button } from '@/components/ui/button';
+import { InvoiceForm } from '@/components/invoice-form';
+import { customersApi, invoicesApi, jobsApi, useShopProfile } from '@/lib/db';
+import { amountInWords, formatINR } from '@/lib/invoice-calc';
+import { downloadInvoicePdf, openInvoicePdf } from '@/lib/invoice-pdf';
+import { pageMeta } from '@/lib/page-meta';
+export const Route=createFileRoute('/invoices/$id')({head:()=>pageMeta('Invoice details','Review, edit and download a GST tax invoice.'),component:InvoiceDetail});
+function InvoiceDetail(){const {id}=Route.useParams();const invoice=invoicesApi.useOne(id);const customers=customersApi.useList();const shop=useShopProfile();const jobs=jobsApi.useList();const update=invoicesApi.useUpdate();const remove=invoicesApi.useRemove();const updateJob=jobsApi.useUpdate();const navigate=useNavigate();const [editing,setEditing]=useState(false);const inv=invoice.data;
+ const fail=(e:unknown)=>toast.error(e instanceof Error?e.message:'Operation failed');
+ if(invoice.isLoading||customers.isLoading||shop.isLoading)return <AppShell title="Invoice"><p>Loading…</p></AppShell>;
+ if(invoice.error||customers.error||shop.error)return <AppShell title="Invoice"><p role="alert">Unable to load invoice.</p></AppShell>;
+ if(!inv)return <AppShell title="Invoice"><p>Invoice not found.</p></AppShell>;
+ const customer=customers.data?.find(c=>c.id===inv.customerId)??null;
+ return <AppShell title={inv.invoiceNo} actions={<Button variant="outline" size="sm" onClick={()=>setEditing(!editing)}>{editing?'Cancel':'Edit'}</Button>}>
+ {editing?<InvoiceForm initial={inv}/>:<><div className="mb-6 flex flex-wrap gap-2"><Button disabled={!shop.data} onClick={()=>{if(shop.data)downloadInvoicePdf(inv,shop.data,customer);}}>Download PDF</Button><Button variant="outline" disabled={!shop.data} onClick={()=>{if(shop.data)openInvoicePdf(inv,shop.data,customer);}}>Print / preview</Button>{inv.status==='Draft'&&<Button variant="outline" disabled={update.isPending} onClick={()=>update.mutate({id,data:{status:'Sent'}},{onError:fail})}>Mark sent</Button>}{inv.status==='Sent'&&<Button variant="outline" disabled={update.isPending} onClick={()=>{if(confirm('Mark this invoice paid? This changes its status only; payment records are separate.'))update.mutate({id,data:{status:'Paid'}},{onError:fail});}}>Mark paid</Button>}<Button variant="destructive" disabled={remove.isPending} onClick={async()=>{if(!confirm('Permanently delete this invoice?'))return;try{for(const j of jobs.data??[]){if(j.invoiceId===id)await updateJob.mutateAsync({id:j.id,data:{invoiceId:null}});}await remove.mutateAsync(id);await navigate({to:'/invoices'});}catch(e){fail(e);}}}>Delete</Button></div>
+ <section className="max-w-4xl"><div className="flex flex-wrap justify-between gap-4 border-y py-6"><div><h2 className="font-display text-xl">{shop.data?.businessName||'Tax invoice'}</h2><p className="text-sm text-muted-foreground">{shop.data?.gstin}</p><h3 className="mt-5 font-semibold">{customer?.name??'Customer unavailable'}</h3><p className="text-sm">{customer?.address}</p><p className="text-sm">{customer?.gstin}</p></div><div><p>{inv.invoiceDate}</p><p className="mt-2 font-semibold text-primary">{inv.status}</p></div></div><div className="overflow-x-auto"><table className="w-full text-left text-sm"><thead><tr className="border-b"><th className="py-4">Description</th><th>HSN/SAC</th><th>Qty</th><th className="text-right">Rate</th><th className="text-right">Amount</th></tr></thead><tbody>{inv.lineItems.map((it,n)=><tr key={n} className="border-b"><td className="min-w-40 py-4">{it.description}</td><td>{it.hsnSacCode}</td><td>{it.quantity} {it.unit}</td><td className="text-right tnum">{formatINR(it.ratePerUnit)}</td><td className="text-right tnum">{formatINR(it.amount)}</td></tr>)}</tbody></table></div><dl className="ml-auto mt-5 max-w-xs space-y-2">{[['Taxable value',inv.taxableValue],['CGST',inv.cgstAmount],['SGST',inv.sgstAmount],['IGST',inv.igstAmount],['Round off',inv.roundOff],['Total',inv.totalAmount]].map(([k,v])=><div key={k} className="flex justify-between"><dt>{k}</dt><dd className="tnum">₹{formatINR(Number(v))}</dd></div>)}</dl><p className="mt-6 border-t py-4 text-sm">{amountInWords(inv.totalAmount)}</p>{inv.notes&&<p className="text-sm text-muted-foreground">{inv.notes}</p>}</section></>}
+ </AppShell>;
+}
