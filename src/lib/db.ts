@@ -11,6 +11,7 @@ import {
   type DocumentData,
 } from "firebase/firestore";
 import { getDb } from "./firebase";
+import { useAuth } from "./auth-context";
 import type { Customer, Invoice, Job, Payment, ShopProfile } from "./types";
 
 type WithId = { id: string };
@@ -62,7 +63,9 @@ export const EMPTY_PROFILE: ShopProfile = {
 };
 
 export function useShopProfile() {
+  const { user, configured } = useAuth();
   return useQuery({
+    enabled: Boolean(user && configured),
     queryKey: ["shopProfile"],
     queryFn: async () => {
       const snap = await getDoc(doc(getDb(), "shopProfile", "main"));
@@ -81,13 +84,18 @@ export function useSaveShopProfile() {
 
 // ---------- Generic hooks factory ----------
 function makeHooks<T extends WithId>(name: string) {
-  const useList = () => useQuery({ queryKey: [name], queryFn: () => listCollection<T>(name) });
-  const useOne = (id: string | undefined) =>
-    useQuery({
+  const useList = () => {
+    const { user, configured } = useAuth();
+    return useQuery({ queryKey: [name], queryFn: () => listCollection<T>(name), enabled: Boolean(user && configured) });
+  };
+  const useOne = (id: string | undefined) => {
+    const { user, configured } = useAuth();
+    return useQuery({
       queryKey: [name, id],
-      queryFn: () => getOne<T>(name, id!),
-      enabled: Boolean(id),
+      queryFn: () => { if (!id) throw new Error("Missing record ID"); return getOne<T>(name, id); },
+      enabled: Boolean(id && user && configured),
     });
+  };
   const useCreate = () => {
     const qc = useQueryClient();
     return useMutation({
