@@ -11,7 +11,7 @@ export function buildInvoicePdf(inv: Invoice, shop: ShopProfile, customer: Custo
   const CW = W - M * 2;
   let y = M;
 
-  const text = (s: string, x: number, yy: number, o: Parameters<typeof pdf.text>[3] = {}) =>
+  const text = (s: string | string[], x: number, yy: number, o: Parameters<typeof pdf.text>[3] = {}) =>
     pdf.text(s || "", x, yy, o);
   const line = (x1: number, y1: number, x2: number, y2: number) => pdf.line(x1, y1, x2, y2);
 
@@ -160,12 +160,14 @@ export function buildInvoicePdf(inv: Invoice, shop: ShopProfile, customer: Custo
         },
         "",
         "",
-        { content: `₹ ${formatINR(inv.totalAmount)}`, styles: { fontStyle: "bold", halign: "right" } },
+        { content: `Rs. ${formatINR(inv.totalAmount)}`, styles: { fontStyle: "bold", halign: "right" } },
       ],
     ],
   });
   // jspdf-autotable attaches lastAutoTable to the doc instance
   y = (pdf as unknown as { lastAutoTable: { finalY: number } }).lastAutoTable.finalY;
+
+  if (y + 24 > 280) { pdf.addPage(); y = M; }
 
   // Amount in words
   pdf.rect(M, y, CW, 12);
@@ -217,6 +219,7 @@ export function buildInvoicePdf(inv: Invoice, shop: ShopProfile, customer: Custo
   y += 8;
 
   // Footer: declaration + bank details (left), signature (right)
+  if (y + 40 > 280) { pdf.addPage(); y = M; }
   const footTop = y;
   const footH = 34;
   pdf.rect(M, footTop, CW, footH);

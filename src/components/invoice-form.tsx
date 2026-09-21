@@ -94,6 +94,12 @@ export function InvoiceForm({ initial, jobId }: { initial?: Invoice; jobId?: str
       toast.error("Add at least one line item");
       return;
     }
+    if (!invoiceDate || !effectiveNo.trim() || items.some(i => !i.description.trim() || !Number.isFinite(i.quantity) || i.quantity <= 0 || !Number.isFinite(i.ratePerUnit) || i.ratePerUnit < 0) || !Number.isFinite(gstRate) || gstRate < 0 || gstRate > 100) {
+      toast.error("Check the date, descriptions, quantities, rates and GST rate"); return;
+    }
+    if (invoices.some(i => i.id !== initial?.id && i.invoiceNo === effectiveNo.trim())) {
+      toast.error("Invoice number already exists"); return;
+    }
     const half = (Number(gstRate) || 0) / 2;
     const payload: Omit<Invoice, "id"> = {
       invoiceNo: effectiveNo,
@@ -141,7 +147,7 @@ export function InvoiceForm({ initial, jobId }: { initial?: Invoice; jobId?: str
 
   return (
     <div className="max-w-5xl space-y-6 pb-8">
-      <section className="rounded-xl border bg-card p-5">
+      <section className="rounded-lg border bg-card p-5">
         <div className="grid gap-4 sm:grid-cols-3">
           <div className="space-y-1.5">
             <Label>Invoice no.</Label>
@@ -179,7 +185,7 @@ export function InvoiceForm({ initial, jobId }: { initial?: Invoice; jobId?: str
         )}
       </section>
 
-      <section className="rounded-xl border bg-card p-5">
+      <section className="rounded-lg border bg-card p-5">
         <div className="mb-3 flex items-center justify-between">
           <h2 className="font-display text-base font-semibold">Items</h2>
           <Button
@@ -194,7 +200,7 @@ export function InvoiceForm({ initial, jobId }: { initial?: Invoice; jobId?: str
           {items.map((it, i) => (
             <div key={i} className="rounded-lg border p-3">
               <div className="grid gap-3 sm:grid-cols-12">
-                <div className="space-y-1.5 sm:col-span-5">
+                <div className="space-y-1.5 sm:col-span-4">
                   <Label className="text-xs">Description</Label>
                   <Input value={it.description} onChange={(e) => setItem(i, { description: e.target.value })} />
                 </div>
@@ -230,7 +236,7 @@ export function InvoiceForm({ initial, jobId }: { initial?: Invoice; jobId?: str
                     onChange={(e) => setItem(i, { ratePerUnit: Number(e.target.value) })}
                   />
                 </div>
-                <div className="flex items-end justify-between gap-2 sm:col-span-1">
+                <div className="flex items-end justify-between gap-2 sm:col-span-2">
                   <span className="tnum text-sm font-medium">{formatINR(it.amount)}</span>
                   <button
                     className="text-muted-foreground hover:text-destructive"
@@ -247,7 +253,7 @@ export function InvoiceForm({ initial, jobId }: { initial?: Invoice; jobId?: str
       </section>
 
       <section className="grid gap-6 lg:grid-cols-2">
-        <div className="rounded-xl border bg-card p-5">
+        <div className="rounded-lg border bg-card p-5">
           <h2 className="mb-4 font-display text-base font-semibold">Despatch & references</h2>
           <div className="grid gap-3 sm:grid-cols-2">
             {(
@@ -275,7 +281,7 @@ export function InvoiceForm({ initial, jobId }: { initial?: Invoice; jobId?: str
           </div>
         </div>
 
-        <div className="rounded-xl border bg-card p-5">
+        <div className="rounded-lg border bg-card p-5">
           <h2 className="mb-4 font-display text-base font-semibold">Tax & totals</h2>
           <div className="mb-4 max-w-40 space-y-1.5">
             <Label className="text-xs">GST rate (%)</Label>
