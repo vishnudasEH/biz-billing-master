@@ -3,7 +3,7 @@ service cloud.firestore {
   match /databases/{database}/documents {
     // Replace this with the owner's UID from Firebase Authentication before deployment.
     function owner() {
-      return request.auth != null && request.auth.uid == 'REPLACE_WITH_OWNER_UID';
+      return request.auth != null && request.auth.uid == 'o0GvQrE9g7S7FROEXpeuhtS78xH2';
     }
     match /shopProfile/main { allow read, write: if owner(); }
     match /customers/{id} { allow read, write: if owner(); }
