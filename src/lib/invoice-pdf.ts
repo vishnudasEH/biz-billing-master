@@ -65,7 +65,9 @@ export function buildInvoicePdf(inv: Invoice, shop: ShopProfile, customer: Custo
   let ry = boxTop;
   for (let i = 0; i < meta.length; i += 2) {
     for (let c = 0; c < 2; c++) {
-      const [k, v] = meta[i + c];
+      const cell = meta[i + c];
+      if (!cell) continue;
+      const [k, v] = cell;
       const x = rx + c * cellW;
       pdf.setFontSize(6.5);
       pdf.setTextColor(90);

@@ -45,7 +45,7 @@ export function nextInvoiceNo(existing: string[], prefix = ""): string {
   let max = 0;
   for (const no of existing) {
     const m = no.match(/(\d+)\s*$/);
-    if (m) max = Math.max(max, parseInt(m[1], 10));
+    if (m?.[1]) max = Math.max(max, parseInt(m[1], 10));
   }
   return `${prefix}${String(max + 1).padStart(3, "0")}`;
 }
@@ -76,17 +76,17 @@ const ONES = [
 const TENS = ["", "", "Twenty", "Thirty", "Forty", "Fifty", "Sixty", "Seventy", "Eighty", "Ninety"];
 
 function twoDigits(n: number): string {
-  if (n < 20) return ONES[n];
+  if (n < 20) return ONES[n] ?? "";
   const t = Math.floor(n / 10);
   const o = n % 10;
-  return TENS[t] + (o ? " " + ONES[o] : "");
+  return (TENS[t] ?? "") + (o ? " " + (ONES[o] ?? "") : "");
 }
 
 function threeDigits(n: number): string {
   const h = Math.floor(n / 100);
   const rest = n % 100;
   const parts: string[] = [];
-  if (h) parts.push(ONES[h] + " Hundred");
+  if (h) parts.push((ONES[h] ?? "") + " Hundred");
   if (rest) parts.push(twoDigits(rest));
   return parts.join(" ");
 }

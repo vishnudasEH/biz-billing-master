@@ -120,7 +120,7 @@ export function AppShell({
 export function NewButton({ to, label }: { to: "/invoices/new"; label: string }) {
   return (
     <Button asChild size="sm">
-      <Link to={to}>
+      <Link to={to} search={{ jobId: undefined }}>
         <Plus /> {label}
       </Link>
     </Button>

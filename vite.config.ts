@@ -8,7 +8,7 @@ import { defineConfig } from "@lovable.dev/vite-tanstack-config";
 
 // GitHub Pages serves project sites from a sub-path (https://<user>.github.io/<repo>/).
 // Set VITE_BASE_PATH="/<repo>/" in CI; defaults to "/" for local dev and Lovable preview.
-const basePath = process.env.VITE_BASE_PATH || "/";
+const basePath = process.env["VITE_BASE_PATH"] || "/";
 
 // Firebase web config is a publishable identifier, not a secret (security comes
 // from Firestore rules). Resolve each value from, in order:
