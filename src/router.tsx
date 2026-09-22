@@ -14,7 +14,7 @@ export const getRouter = () => {
     context: { queryClient },
     scrollRestoration: true,
     defaultPreloadStaleTime: 0,
-    basepath: base === "/" ? undefined : base.replace(/\/$/, ""),
+    basepath: base === "/" ? "/" : base.replace(/\/$/, ""),
   });
 
   return router;

@@ -28,7 +28,7 @@ const emptyItem = (slNo: number): LineItem => ({
   amount: 0,
 });
 
-export function InvoiceForm({ initial, jobId }: { initial?: Invoice; jobId?: string }) {
+export function InvoiceForm({ initial, jobId }: { initial?: Invoice; jobId?: string | undefined }) {
   const navigate = useNavigate();
   const { data: customers = [] } = customersApi.useList();
   const { data: invoices = [] } = invoicesApi.useList();

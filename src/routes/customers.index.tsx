@@ -104,7 +104,10 @@ export function CustomerDialog({
         <DialogFooter>
           <Button
             onClick={() => {
-              if (!f.name.trim()) return toast.error("Customer name is required");
+              if (!f.name.trim()) {
+                toast.error("Customer name is required");
+                return;
+              }
               onSave(f);
               setOpen(false);
             }}
