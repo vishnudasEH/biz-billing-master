@@ -2,11 +2,13 @@ import { initializeApp, getApps, getApp, type FirebaseApp, type FirebaseOptions 
 import { getAuth, GoogleAuthProvider, type Auth } from "firebase/auth";
 import { getFirestore, type Firestore } from "firebase/firestore";
 
+declare const __FIREBASE_API_KEY__: string;
+
 // Firebase web config identifies this public web app; Firestore Security Rules
 // protect the data. Keep the project identifiers here so preview and static
 // builds do not depend on runtime-only environment injection.
 const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY as string | undefined,
+  apiKey: __FIREBASE_API_KEY__,
   authDomain: "balaji-wood-kraft.firebaseapp.com",
   projectId: "balaji-wood-kraft",
   storageBucket: "balaji-wood-kraft.firebasestorage.app",
