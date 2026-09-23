@@ -32,9 +32,12 @@ const firebaseEnv: Record<string, string> = {
 export default defineConfig({
   vite: {
     base: basePath,
-    define: Object.fromEntries(
-      Object.entries(firebaseEnv).map(([k, v]) => [`import.meta.env.${k}`, JSON.stringify(v)]),
-    ),
+    define: {
+      ...Object.fromEntries(
+        Object.entries(firebaseEnv).map(([k, v]) => [`import.meta.env.${k}`, JSON.stringify(v)]),
+      ),
+      __FIREBASE_API_KEY__: JSON.stringify(firebaseEnv["VITE_FIREBASE_API_KEY"] ?? ""),
+    },
   },
   tanstackStart: {
     // Redirect TanStack Start's bundled server entry to src/server.ts (our SSR error wrapper).
