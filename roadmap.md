@@ -1,9 +1,9 @@
 # Core completion
-- [ ] Dashboard and jobs CRUD
-- [ ] Invoice list, create/edit, detail and PDF actions
-- [ ] Customer detail and history
-- [ ] Owner-only rules and GitHub Pages deployment instructions
-- [ ] Verify public screens and static output
-- [ ] Live Firebase verification — requires Firebase configuration and owner account
+- [x] Dashboard and jobs CRUD
+- [x] Invoice list, create/edit, detail and PDF actions
+- [x] Customer detail and history
+- [x] Owner-only rules and GitHub Pages deployment instructions
+- [x] Verify public screens and static output
+- [ ] Live Firebase verification — confirm login using the configured owner account
 
 Deferred by scope: payment entry, expanded analytics, JSON import.

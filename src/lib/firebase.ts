@@ -2,19 +2,19 @@ import { initializeApp, getApps, getApp, type FirebaseApp, type FirebaseOptions 
 import { getAuth, GoogleAuthProvider, type Auth } from "firebase/auth";
 import { getFirestore, type Firestore } from "firebase/firestore";
 
-// Firebase web config is a publishable identifier (not a secret). Data access
-// is protected by Firestore Security Rules (see firestore.rules), not by hiding
-// these values. Provide them via VITE_FIREBASE_* environment variables.
+// Firebase web config identifies this public web app; Firestore Security Rules
+// protect the data. Keep the project identifiers here so preview and static
+// builds do not depend on runtime-only environment injection.
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY as string | undefined,
-  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN as string | undefined,
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID as string | undefined,
-  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET as string | undefined,
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID as string | undefined,
-  appId: import.meta.env.VITE_FIREBASE_APP_ID as string | undefined,
+  authDomain: "balaji-wood-kraft.firebaseapp.com",
+  projectId: "balaji-wood-kraft",
+  storageBucket: "balaji-wood-kraft.firebasestorage.app",
+  messagingSenderId: "1094512532369",
+  appId: "1:1094512532369:web:216aebc027eb068bcf1830",
 };
 
-export const isFirebaseConfigured = Boolean(firebaseConfig.apiKey && firebaseConfig.projectId);
+export const isFirebaseConfigured = Boolean(firebaseConfig.apiKey);
 
 let app: FirebaseApp | null = null;
 
