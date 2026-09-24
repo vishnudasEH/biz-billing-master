@@ -1,43 +1,55 @@
-// scripts/prepare-pages.mjs
 import {
   cpSync,
   existsSync,
   mkdirSync,
   readdirSync,
+  statSync,
   writeFileSync,
 } from "node:fs";
-import { dirname, join } from "node:path";
+import { join, resolve } from "node:path";
 
-const preferredFiles = [
-  "dist/client/index.html",
-  ".output/public/index.html",
-  "dist/index.html",
-];
+const ignoredDirectories = new Set([
+  ".git",
+  "node_modules",
+  "pages-dist",
+]);
 
-const preferred = preferredFiles.find((file) => existsSync(file));
+function findIndexHtml(directory) {
+  if (!existsSync(directory)) return null;
 
-const discovered =
-  preferred ||
-  readdirSync(".", { recursive: true })
-    .filter(
-      (file) =>
-        typeof file === "string" &&
-        file.endsWith("/index.html") &&
-        !file.startsWith("node_modules/") &&
-        !file.startsWith(".git/") &&
-        !file.startsWith("pages-dist/"),
-    )
-    .find((file) => existsSync(file));
+  for (const entry of readdirSync(directory)) {
+    if (ignoredDirectories.has(entry)) continue;
 
-if (!discovered) {
+    const path = join(directory, entry);
+    const stats = statSync(path);
+
+    if (stats.isFile() && entry === "index.html") {
+      return path;
+    }
+
+    if (stats.isDirectory()) {
+      const result = findIndexHtml(path);
+      if (result) return result;
+    }
+  }
+
+  return null;
+}
+
+const projectRoot = resolve(".");
+const indexPath = findIndexHtml(projectRoot);
+
+if (!indexPath) {
   throw new Error(
-    "Static index.html was not generated. Searched the build output for index.html.",
+    "Static index.html was not generated. Expected the build to produce an index.html under the project root.",
   );
 }
 
-const root = dirname(discovered);
+const sourceRoot = indexPath.slice(0, -"/index.html".length);
 
 mkdirSync("pages-dist", { recursive: true });
-cpSync(root, "pages-dist", { recursive: true });
-cpSync(join(root, "index.html"), "pages-dist/404.html");
+cpSync(sourceRoot, "pages-dist", { recursive: true });
+cpSync(indexPath, "pages-dist/404.html");
 writeFileSync("pages-dist/.nojekyll", "");
+
+console.log(`Using static output: ${sourceRoot}`);
