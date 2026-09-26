@@ -2,47 +2,29 @@ import {
   cpSync,
   existsSync,
   mkdirSync,
-  readdirSync,
-  statSync,
   writeFileSync,
 } from "node:fs";
 import { join, resolve } from "node:path";
 
-const ignoredDirectories = new Set([
-  ".git",
-  "node_modules",
-  "pages-dist",
-]);
+const projectRoot = resolve(".");
+const candidates = [".output/public", "dist", "build"];
 
-function findIndexHtml(directory) {
-  if (!existsSync(directory)) return null;
+let sourceRoot = null;
+let indexPath = null;
 
-  for (const entry of readdirSync(directory)) {
-    if (ignoredDirectories.has(entry)) continue;
-
-    const path = join(directory, entry);
-    const stats = statSync(path);
-
-    if (stats.isFile() && entry === "index.html") {
-      return path;
-    }
-
-    if (stats.isDirectory()) {
-      const result = findIndexHtml(path);
-      if (result) return result;
-    }
+for (const candidate of candidates) {
+  const dir = join(projectRoot, candidate);
+  const file = join(dir, "index.html");
+  if (existsSync(file)) {
+    sourceRoot = dir;
+    indexPath = file;
+    break;
   }
-
-  return null;
 }
 
-const projectRoot = resolve(".");
-const sourceRoot = resolve("dist"); // or "build", depending on your Vite config
-const indexPath = join(sourceRoot, "index.html");
-
-if (!existsSync(indexPath)) {
+if (!sourceRoot || !indexPath) {
   throw new Error(
-    "Static index.html was not generated. Expected the build to produce an index.html under the project root.",
+    "Static index.html was not generated. Expected the build to produce an index.html in .output/public, dist, or build.",
   );
 }
 
