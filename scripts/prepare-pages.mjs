@@ -37,15 +37,14 @@ function findIndexHtml(directory) {
 }
 
 const projectRoot = resolve(".");
-const indexPath = findIndexHtml(projectRoot);
+const sourceRoot = resolve("dist"); // or "build", depending on your Vite config
+const indexPath = join(sourceRoot, "index.html");
 
-if (!indexPath) {
+if (!existsSync(indexPath)) {
   throw new Error(
     "Static index.html was not generated. Expected the build to produce an index.html under the project root.",
   );
 }
-
-const sourceRoot = indexPath.slice(0, -"/index.html".length);
 
 mkdirSync("pages-dist", { recursive: true });
 cpSync(sourceRoot, "pages-dist", { recursive: true });
