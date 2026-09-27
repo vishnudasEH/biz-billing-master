@@ -19,10 +19,10 @@ export function PaymentDialog({ trigger, initial, onSave }: { trigger: ReactNode
   const blank = (): PaymentInput => ({ customerId: initial?.customerId ?? '', amount: initial?.amount ?? 0, date: initial?.date ?? todayISO(), type: initial?.type ?? 'Advance', linkedInvoiceId: initial?.linkedInvoiceId ?? null, notes: initial?.notes ?? '', createdAt: initial?.createdAt ?? new Date().toISOString() });
   const [f, setF] = useState<PaymentInput>(blank);
   const custInvoices = (invoices.data ?? []).filter((i) => i.customerId === f.customerId && i.status !== 'Draft');
-  const save = async () => {
-    if (!f.customerId) return toast.error('Select a customer');
-    if (!(f.amount > 0)) return toast.error('Amount must be greater than 0');
-    if (!f.date) return toast.error('Date is required');
+  const save = async (): Promise<void> => {
+    if (!f.customerId) { toast.error('Select a customer'); return; }
+    if (!(f.amount > 0)) { toast.error('Amount must be greater than 0'); return; }
+    if (!f.date) { toast.error('Date is required'); return; }
     setBusy(true);
     try { await onSave(f); setOpen(false); } catch (e) { toast.error(e instanceof Error ? e.message : 'Save failed'); } finally { setBusy(false); }
   };
