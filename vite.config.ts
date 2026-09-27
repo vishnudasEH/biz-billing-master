@@ -47,4 +47,9 @@ export default defineConfig({
     // so we ship a single SPA shell that GitHub Pages can host.
     spa: { enabled: true },
   },
+  // GitHub Pages can only serve static files — build with Nitro's "static"
+  // preset instead of the default "cloudflare-module" server preset, so the
+  // build prerenders real .html files under .output/public/ with no server
+  // runtime. Firebase Auth/Firestore run client-side, so nothing is lost.
+  nitro: { preset: "static" },
 });
