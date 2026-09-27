@@ -51,5 +51,5 @@ export default defineConfig({
   // preset instead of the default "cloudflare-module" server preset, so the
   // build prerenders real .html files under .output/public/ with no server
   // runtime. Firebase Auth/Firestore run client-side, so nothing is lost.
-  nitro: { preset: "static" },
+  nitro: false,
 });
