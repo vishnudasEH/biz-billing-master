@@ -8,6 +8,7 @@ import {
   Settings,
   LogOut,
   Plus,
+  Wallet,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
@@ -17,6 +18,7 @@ const NAV = [
   { to: "/", label: "Dashboard", icon: LayoutDashboard },
   { to: "/jobs", label: "Jobs", icon: Hammer },
   { to: "/invoices", label: "Invoices", icon: FileText },
+  { to: "/payments", label: "Payments", icon: Wallet },
   { to: "/customers", label: "Customers", icon: Users },
   { to: "/settings", label: "Shop", icon: Settings },
 ] as const;
@@ -98,7 +100,7 @@ export function AppShell({
       </div>
 
       {/* Mobile bottom nav */}
-      <nav className="fixed inset-x-0 bottom-0 z-30 grid grid-cols-5 border-t border-sidebar-border bg-sidebar text-sidebar-foreground md:hidden">
+      <nav className="fixed inset-x-0 bottom-0 z-30 grid grid-cols-6 border-t border-sidebar-border bg-sidebar text-sidebar-foreground md:hidden">
         {NAV.map(({ to, label, icon: Icon }) => (
           <Link
             key={to}
