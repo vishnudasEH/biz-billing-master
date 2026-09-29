@@ -1,0 +1,90 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" width="500" height="500">
+  <defs>
+    <style>
+      .brown { fill: #7a441e; }
+      .brown-stroke { stroke: #7a441e; fill: none; }
+      .white { fill: #ffffff; }
+      .white-stroke { stroke: #ffffff; fill: none; }
+      .brand-title { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-weight: 900; font-size: 38px; letter-spacing: 2px; }
+      .brand-subtitle { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-weight: 800; font-size: 16px; letter-spacing: 3.5px; }
+    </style>
+    <path id="curve" d="M 105,320 A 155,155 0 0,0 395,320" fill="none" />
+  </defs>
+
+  <!-- Outer Cog Gear -->
+  <path d="M 455.0,250.0 L 454.0,270.0 L 492.8,282.4 L 488.5,305.9 L 447.8,303.7 L 442.6,320.1 L 442.6,320.1 L 434.9,338.6 L 467.1,363.5 L 455.0,384.2 L 417.5,368.2 L 407.0,381.8 L 407.0,381.8 L 393.4,396.5 L 415.2,430.9 L 396.8,446.2 L 367.0,418.3 L 352.5,427.5 L 352.5,427.5 L 334.7,436.7 L 343.4,476.5 L 320.8,484.5 L 302.4,448.2 L 285.6,451.9 L 285.6,451.9 L 265.7,454.4 L 260.3,494.8 L 236.3,494.6 L 231.4,454.2 L 214.4,451.9 L 214.4,451.9 L 194.9,447.4 L 175.9,483.5 L 153.5,475.2 L 162.7,435.5 L 147.5,427.5 L 147.5,427.5 L 130.7,416.7 L 100.5,444.1 L 82.3,428.6 L 104.5,394.5 L 93.0,381.8 L 93.0,381.8 L 80.9,365.8 L 43.1,381.3 L 31.3,360.5 L 63.9,336.0 L 57.4,320.1 L 57.4,320.1 L 51.4,301.0 L 10.7,302.6 L 6.7,279.0 L 45.7,267.2 L 45.0,250.0 L 45.0,250.0 L 46.0,230.0 L 7.2,217.6 L 11.5,194.1 L 52.2,196.3 L 57.4,179.9 L 57.4,179.9 L 65.1,161.4 L 32.9,136.5 L 45.0,115.8 L 82.5,131.8 L 93.0,118.2 L 93.0,118.2 L 106.6,103.5 L 84.8,69.1 L 103.2,53.8 L 133.0,81.7 L 147.5,72.5 L 147.5,72.5 L 165.3,63.3 L 156.6,23.5 L 179.2,15.5 L 197.6,51.8 L 214.4,48.1 L 214.4,48.1 L 234.3,45.6 L 239.7,5.2 L 263.7,5.4 L 268.6,45.8 L 285.6,48.1 L 285.6,48.1 L 305.1,52.6 L 324.1,16.5 L 346.5,24.8 L 337.3,64.5 L 352.5,72.5 L 352.5,72.5 L 369.3,83.3 L 399.5,55.9 L 417.7,71.4 L 395.5,105.5 L 407.0,118.2 L 407.0,118.2 L 419.1,134.2 L 456.9,118.7 L 468.7,139.5 L 436.1,164.0 L 442.6,179.9 L 442.6,179.9 L 448.6,199.0 L 489.3,197.4 L 493.3,221.0 L 454.3,232.8 L 455.0,250.0 Z" class="brown" />
+  <circle cx="250" cy="250" r="195" fill="none" stroke="#7a441e" stroke-width="12" />
+
+  <!-- Center Circle Cutout Background -->
+  <circle cx="250" cy="250" r="188" fill="#ffffff" />
+  <circle cx="250" cy="250" r="186" fill="none" stroke="#7a441e" stroke-width="4" />
+
+  <!-- CNC Router Machine Art -->
+  <g id="cnc-machine">
+    <!-- Machine Base -->
+    <path d="M 140,265 L 360,265 C 365,265 368,260 366,256 C 362,250 355,248 340,248 L 160,248 C 145,248 138,250 134,256 C 132,260 135,265 140,265 Z" class="brown" />
+    
+    <!-- Vertical Gantry Pillars -->
+    <rect x="168" y="145" width="20" height="104" rx="4" class="brown" />
+    <rect x="312" y="145" width="20" height="104" rx="4" class="brown" />
+    <circle cx="178" cy="188" r="4" fill="#ffffff" />
+    <circle cx="322" cy="188" r="4" fill="#ffffff" />
+
+    <!-- Top Horizontal Crossbeam Gantry -->
+    <rect x="140" y="128" width="220" height="34" rx="10" class="brown" />
+    <rect x="144" y="133" width="212" height="24" rx="6" fill="#ffffff" />
+    <rect x="150" y="141" width="200" height="8" rx="3" class="brown" />
+
+    <!-- Spindle Motor Housing -->
+    <rect x="226" y="118" width="48" height="64" rx="8" class="brown" />
+    <rect x="234" y="112" width="32" height="10" rx="3" class="brown" />
+    <line x1="230" y1="138" x2="270" y2="138" stroke="#ffffff" stroke-width="3" />
+    <line x1="230" y1="146" x2="270" y2="146" stroke="#ffffff" stroke-width="3" />
+
+    <!-- Tool Chuck & Router Bit -->
+    <polygon points="242,182 258,182 255,198 245,198" class="brown" />
+    <rect x="247" y="198" width="6" height="28" fill="#7a441e" />
+    <!-- Flute spirals -->
+    <line x1="247" y1="204" x2="253" y2="208" stroke="#ffffff" stroke-width="2" />
+    <line x1="247" y1="212" x2="253" y2="216" stroke="#ffffff" stroke-width="2" />
+    <polygon points="246,226 254,226 250,233" class="brown" />
+
+    <!-- Workpiece Material Board with striped carving texture -->
+    <rect x="180" y="233" width="140" height="16" rx="2" class="brown" />
+    <g stroke="#ffffff" stroke-width="2.5" stroke-linecap="round">
+      <line x1="192" y1="247" x2="204" y2="235" />
+      <line x1="207" y1="247" x2="219" y2="235" />
+      <line x1="222" y1="247" x2="234" y2="235" />
+      <line x1="237" y1="247" x2="249" y2="235" />
+      <line x1="252" y1="247" x2="264" y2="235" />
+      <line x1="267" y1="247" x2="279" y2="235" />
+      <line x1="282" y1="247" x2="294" y2="235" />
+      <line x1="297" y1="247" x2="309" y2="235" />
+    </g>
+
+    <!-- Cutting Sparks / Wood Chips flying -->
+    <g stroke="#7a441e" stroke-width="2.5" stroke-linecap="round">
+      <line x1="245" y1="231" x2="235" y2="224" />
+      <line x1="255" y1="231" x2="265" y2="224" />
+      <line x1="247" y1="229" x2="243" y2="220" />
+      <line x1="253" y1="229" x2="257" y2="220" />
+      <circle cx="232" cy="223" r="1.5" class="brown" />
+      <circle cx="268" cy="223" r="1.5" class="brown" />
+      <circle cx="250" cy="218" r="1.5" class="brown" />
+    </g>
+  </g>
+
+  <!-- Horizontal Center Divider and Brand Name -->
+  <g id="brand-text">
+    <rect x="0" y="280" width="500" height="62" fill="#ffffff" />
+    <line x1="5" y1="280" x2="495" y2="280" stroke="#7a441e" stroke-width="4" />
+    <line x1="5" y1="342" x2="495" y2="342" stroke="#7a441e" stroke-width="4" />
+    
+    <text x="250" y="325" text-anchor="middle" class="brown brand-title">BALAJI WOOD KRAFT</text>
+  </g>
+
+  <!-- Arc Subtitle: CNC CUTTING AND CARVING -->
+  <text class="brown brand-subtitle">
+    <textPath href="#curve" startOffset="50%" text-anchor="middle">CNC CUTTING AND CARVING</textPath>
+  </text>
+</svg>

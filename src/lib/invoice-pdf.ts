@@ -11,8 +11,12 @@ export function buildInvoicePdf(inv: Invoice, shop: ShopProfile, customer: Custo
   const CW = W - M * 2;
   let y = M;
 
-  const text = (s: string | string[], x: number, yy: number, o: Parameters<typeof pdf.text>[3] = {}) =>
-    pdf.text(s || "", x, yy, o);
+  const text = (
+    s: string | string[],
+    x: number,
+    yy: number,
+    o: Parameters<typeof pdf.text>[3] = {},
+  ) => pdf.text(s || "", x, yy, o);
   const line = (x1: number, y1: number, x2: number, y2: number) => pdf.line(x1, y1, x2, y2);
 
   pdf.setLineWidth(0.25);
@@ -36,7 +40,10 @@ export function buildInvoicePdf(inv: Invoice, shop: ShopProfile, customer: Custo
   pdf.setFontSize(8);
   const sellerLines = pdf.splitTextToSize(
     [shop.address, `GSTIN/UIN: ${shop.gstin}`, `State Name: ${shop.state}, Code: ${shop.stateCode}`]
-      .concat(shop.phone ? [`Contact: ${shop.phone}`] : [], shop.email ? [`E-Mail: ${shop.email}`] : [])
+      .concat(
+        shop.phone ? [`Contact: ${shop.phone}`] : [],
+        shop.email ? [`E-Mail: ${shop.email}`] : [],
+      )
       .filter(Boolean)
       .join("\n"),
     half - 4,
@@ -148,10 +155,18 @@ export function buildInvoicePdf(inv: Invoice, shop: ShopProfile, customer: Custo
       5: { cellWidth: 14, halign: "center" },
       6: { cellWidth: 28, halign: "right" },
     },
-    head: [["Sl", "Description of Goods / Services", "HSN/SAC", "Quantity", "Rate", "per", "Amount"]],
+    head: [
+      ["Sl", "Description of Goods / Services", "HSN/SAC", "Quantity", "Rate", "per", "Amount"],
+    ],
     body: [
       ...body,
-      ...taxRows.map((r) => r.map((c, i) => (i === 1 ? { content: c, styles: { fontStyle: "italic" as const, halign: "right" as const } } : c))),
+      ...taxRows.map((r) =>
+        r.map((c, i) =>
+          i === 1
+            ? { content: c, styles: { fontStyle: "italic" as const, halign: "right" as const } }
+            : c,
+        ),
+      ),
       [
         { content: "", styles: {} },
         { content: "Total", styles: { fontStyle: "bold", halign: "right" } },
@@ -162,14 +177,20 @@ export function buildInvoicePdf(inv: Invoice, shop: ShopProfile, customer: Custo
         },
         "",
         "",
-        { content: `Rs. ${formatINR(inv.totalAmount)}`, styles: { fontStyle: "bold", halign: "right" } },
+        {
+          content: `Rs. ${formatINR(inv.totalAmount)}`,
+          styles: { fontStyle: "bold", halign: "right" },
+        },
       ],
     ],
   });
   // jspdf-autotable attaches lastAutoTable to the doc instance
   y = (pdf as unknown as { lastAutoTable: { finalY: number } }).lastAutoTable.finalY;
 
-  if (y + 24 > 280) { pdf.addPage(); y = M; }
+  if (y + 24 > 280) {
+    pdf.addPage();
+    y = M;
+  }
 
   // Amount in words
   pdf.rect(M, y, CW, 12);
@@ -189,29 +210,75 @@ export function buildInvoicePdf(inv: Invoice, shop: ShopProfile, customer: Custo
   const taxHead =
     inv.taxType === "IGST"
       ? [["HSN/SAC", "Taxable Value", "IGST Rate", "IGST Amount", "Total Tax Amount"]]
-      : [["HSN/SAC", "Taxable Value", "CGST Rate", "CGST Amount", "SGST Rate", "SGST Amount", "Total Tax Amount"]];
+      : [
+          [
+            "HSN/SAC",
+            "Taxable Value",
+            "CGST Rate",
+            "CGST Amount",
+            "SGST Rate",
+            "SGST Amount",
+            "Total Tax Amount",
+          ],
+        ];
   const totalTax = inv.cgstAmount + inv.sgstAmount + inv.igstAmount;
   const taxBody =
     inv.taxType === "IGST"
       ? [
-          [hsn, formatINR(inv.taxableValue), `${inv.igstRate}%`, formatINR(inv.igstAmount), formatINR(totalTax)],
-          ["Total", formatINR(inv.taxableValue), "", formatINR(inv.igstAmount), formatINR(totalTax)],
+          [
+            hsn,
+            formatINR(inv.taxableValue),
+            `${inv.igstRate}%`,
+            formatINR(inv.igstAmount),
+            formatINR(totalTax),
+          ],
+          [
+            "Total",
+            formatINR(inv.taxableValue),
+            "",
+            formatINR(inv.igstAmount),
+            formatINR(totalTax),
+          ],
         ]
       : [
-          [hsn, formatINR(inv.taxableValue), `${inv.cgstRate}%`, formatINR(inv.cgstAmount), `${inv.sgstRate}%`, formatINR(inv.sgstAmount), formatINR(totalTax)],
-          ["Total", formatINR(inv.taxableValue), "", formatINR(inv.cgstAmount), "", formatINR(inv.sgstAmount), formatINR(totalTax)],
+          [
+            hsn,
+            formatINR(inv.taxableValue),
+            `${inv.cgstRate}%`,
+            formatINR(inv.cgstAmount),
+            `${inv.sgstRate}%`,
+            formatINR(inv.sgstAmount),
+            formatINR(totalTax),
+          ],
+          [
+            "Total",
+            formatINR(inv.taxableValue),
+            "",
+            formatINR(inv.cgstAmount),
+            "",
+            formatINR(inv.sgstAmount),
+            formatINR(totalTax),
+          ],
         ];
   autoTable(pdf, {
     startY: y,
     margin: { left: M, right: M },
     theme: "grid",
-    styles: { fontSize: 7.5, cellPadding: 1.4, lineColor: 0, lineWidth: 0.25, textColor: 0, halign: "right" },
+    styles: {
+      fontSize: 7.5,
+      cellPadding: 1.4,
+      lineColor: 0,
+      lineWidth: 0.25,
+      textColor: 0,
+      halign: "right",
+    },
     headStyles: { fillColor: [245, 245, 245], textColor: 0, fontStyle: "bold", halign: "center" },
     columnStyles: { 0: { halign: "left" } },
     head: taxHead,
     body: taxBody,
     didParseCell: (d) => {
-      if (d.section === "body" && d.row.index === taxBody.length - 1) d.cell.styles.fontStyle = "bold";
+      if (d.section === "body" && d.row.index === taxBody.length - 1)
+        d.cell.styles.fontStyle = "bold";
     },
   });
   y = (pdf as unknown as { lastAutoTable: { finalY: number } }).lastAutoTable.finalY;
@@ -221,7 +288,10 @@ export function buildInvoicePdf(inv: Invoice, shop: ShopProfile, customer: Custo
   y += 8;
 
   // Footer: declaration + bank details (left), signature (right)
-  if (y + 40 > 280) { pdf.addPage(); y = M; }
+  if (y + 40 > 280) {
+    pdf.addPage();
+    y = M;
+  }
   const footTop = y;
   const footH = 34;
   pdf.rect(M, footTop, CW, footH);

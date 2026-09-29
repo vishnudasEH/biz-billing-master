@@ -165,12 +165,11 @@ Include a simple "Import from JSON" feature: a text box where the user can paste
 Define and document the expected JSON shape clearly, e.g.:
 
 {
-  "customerName": "string",
-  "date": "YYYY-MM-DD",
-  "items": [{ "description": "string", "quantity": 0, "rate": 0 }],
-  "notes": "string (optional)"
+"customerName": "string",
+"date": "YYYY-MM-DD",
+"items": [{ "description": "string", "quantity": 0, "rate": 0 }],
+"notes": "string (optional)"
 }
-
 
 This is a manual paste-in workflow only — do NOT build any direct image upload, OCR, or AI vision API integration into the app itself (avoids exposing API keys in a serverless/static frontend)
 

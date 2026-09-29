@@ -60,7 +60,7 @@ export function AppShell({
               ₹
             </span>
             <span className="font-display text-base font-semibold text-sidebar-accent-foreground">
-              ShopLedger
+              Balaji Wood Kraft
             </span>
           </div>
         </div>

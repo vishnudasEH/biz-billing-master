@@ -31,6 +31,7 @@ export function CustomerDialog({
     stateCode: initial?.stateCode ?? "33",
     phone: initial?.phone ?? "",
     email: initial?.email ?? "",
+    monthlyGstBilling: initial?.monthlyGstBilling ?? false,
     createdAt: initial?.createdAt ?? new Date().toISOString().slice(0, 10),
   });
 
@@ -82,6 +83,23 @@ export function CustomerDialog({
           <div className="space-y-1.5">
             <Label>Email</Label>
             <Input value={f.email} onChange={(e) => setF({ ...f, email: e.target.value })} />
+          </div>
+          <div className="sm:col-span-2 pt-1">
+            <label className="flex items-center gap-2.5 text-sm cursor-pointer select-none">
+              <input
+                type="checkbox"
+                className="rounded border-input h-4 w-4 text-primary focus:ring-primary"
+                checked={Boolean(f.monthlyGstBilling)}
+                onChange={(e) => setF({ ...f, monthlyGstBilling: e.target.checked })}
+              />
+              <div>
+                <span className="font-semibold text-foreground">Monthly GST Invoicing</span>
+                <p className="text-xs text-muted-foreground">
+                  Tick for regular businesses requiring monthly consolidated GST invoices. Untick
+                  for walk-in cash customers.
+                </p>
+              </div>
+            </label>
           </div>
         </div>
         <DialogFooter>

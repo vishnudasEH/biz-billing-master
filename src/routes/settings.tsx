@@ -12,9 +12,15 @@ export const Route = createFileRoute("/settings")({
   head: () => ({
     meta: [
       { title: "Shop details — ShopLedger" },
-      { name: "description", content: "Business name, GSTIN, address and bank details used on invoices." },
+      {
+        name: "description",
+        content: "Business name, GSTIN, address and bank details used on invoices.",
+      },
       { property: "og:title", content: "Shop details — ShopLedger" },
-      { property: "og:description", content: "Business name, GSTIN, address and bank details used on invoices." },
+      {
+        property: "og:description",
+        content: "Business name, GSTIN, address and bank details used on invoices.",
+      },
     ],
   }),
   component: SettingsPage,
@@ -34,7 +40,11 @@ function Field({
   return (
     <div className="space-y-1.5">
       <Label>{label}</Label>
-      <Input value={value ?? ""} placeholder={placeholder} onChange={(e) => onChange(e.target.value)} />
+      <Input
+        value={value ?? ""}
+        placeholder={placeholder}
+        onChange={(e) => onChange(e.target.value)}
+      />
     </div>
   );
 }
@@ -71,7 +81,11 @@ function SettingsPage() {
           <section className="rounded-xl border bg-card p-5">
             <h2 className="mb-4 font-display text-base font-semibold">Business</h2>
             <div className="grid gap-4 sm:grid-cols-2">
-              <Field label="Business name" value={form.businessName} onChange={set("businessName")} />
+              <Field
+                label="Business name"
+                value={form.businessName}
+                onChange={set("businessName")}
+              />
               <Field label="GSTIN / UIN" value={form.gstin} onChange={set("gstin")} />
               <div className="space-y-1.5 sm:col-span-2">
                 <Label>Address</Label>
@@ -88,7 +102,11 @@ function SettingsPage() {
                   value={form.state}
                   onChange={(e) => {
                     const st = INDIAN_STATES.find((s) => s.name === e.target.value);
-                    setForm((f) => ({ ...f, state: e.target.value, stateCode: st?.code ?? f.stateCode }));
+                    setForm((f) => ({
+                      ...f,
+                      state: e.target.value,
+                      stateCode: st?.code ?? f.stateCode,
+                    }));
                   }}
                 >
                   {INDIAN_STATES.map((s) => (
@@ -108,7 +126,11 @@ function SettingsPage() {
             <h2 className="mb-4 font-display text-base font-semibold">Bank details</h2>
             <div className="grid gap-4 sm:grid-cols-2">
               <Field label="Bank name" value={form.bankName} onChange={set("bankName")} />
-              <Field label="Account number" value={form.accountNumber} onChange={set("accountNumber")} />
+              <Field
+                label="Account number"
+                value={form.accountNumber}
+                onChange={set("accountNumber")}
+              />
               <Field label="Branch" value={form.branch} onChange={set("branch")} />
               <Field label="IFSC" value={form.ifsc} onChange={set("ifsc")} />
               <Field

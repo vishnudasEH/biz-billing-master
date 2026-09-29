@@ -1,4 +1,5 @@
 # Core completion
+
 - [x] Dashboard and jobs CRUD
 - [x] Invoice list, create/edit, detail and PDF actions
 - [x] Customer detail and history

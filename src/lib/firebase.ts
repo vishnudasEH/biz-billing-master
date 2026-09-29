@@ -1,4 +1,10 @@
-import { initializeApp, getApps, getApp, type FirebaseApp, type FirebaseOptions } from "firebase/app";
+import {
+  initializeApp,
+  getApps,
+  getApp,
+  type FirebaseApp,
+  type FirebaseOptions,
+} from "firebase/app";
 import { getAuth, GoogleAuthProvider, type Auth } from "firebase/auth";
 import { getFirestore, type Firestore } from "firebase/firestore";
 

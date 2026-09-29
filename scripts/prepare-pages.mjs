@@ -1,10 +1,4 @@
-import {
-  cpSync,
-  existsSync,
-  mkdirSync,
-  rmSync,
-  writeFileSync,
-} from "node:fs";
+import { cpSync, existsSync, mkdirSync, rmSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 
 // The app is a fully client-side SPA (Firebase is the backend), so the build

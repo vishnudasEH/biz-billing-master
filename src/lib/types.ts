@@ -27,20 +27,57 @@ export interface Customer {
   stateCode: string;
   phone?: string;
   email?: string;
+  monthlyGstBilling?: boolean;
   createdAt: string;
 }
 
-export type JobStatus = "In Progress" | "Completed";
+export type JobStatus = "Received" | "In Progress" | "Completed" | "Delivered";
+
+export const WOOD_TYPES = [
+  "Wood",
+  "MDF",
+  "Plywood",
+  "WPC",
+  "Korian",
+  "WPC Door",
+  "ACP",
+  "Others",
+] as const;
+
+export type WoodType = (typeof WOOD_TYPES)[number];
+
+export interface JobItem {
+  slNo: number;
+  description: string;
+  size: string; // free text e.g. "6x6 mm" or "206.5 sqft"
+  amount: number;
+  quantity?: number; // optional helper
+  rate?: number; // optional helper
+}
 
 export interface Job {
   id: string;
-  description: string;
+  jobNo: string; // e.g. JW-0001 (auto generated, editable, unique)
+  date: string; // YYYY-MM-DD
   customerId: string;
-  dateCreated: string;
-  dateCompleted?: string | null;
+  customerName: string; // stored directly so old printouts never change
+  mobile?: string;
+  designFileId?: string;
+  woodTypes: string[];
+  woodTypeOther?: string;
+  materialSuppliedBy?: string; // "Customer" | "Shop" | free text
+  items: JobItem[];
+  total: number;
+  notes?: string;
+  deliveryDate?: string | null;
   status: JobStatus;
   invoiceId?: string | null;
-  notes?: string;
+  createdAt: string;
+
+  // Legacy compatibility fields
+  description?: string;
+  dateCreated?: string;
+  dateCompleted?: string | null;
 }
 
 export interface LineItem {
@@ -88,14 +125,18 @@ export interface Invoice {
   createdAt: string;
 }
 
-export type PaymentType = "Advance" | "Full Payment" | "Balance Payment";
+export type PaymentMode = "Bank" | "GPay" | "Cash";
+export type PaymentType = "Advance" | "Balance" | "Full" | "Full Payment" | "Balance Payment";
 
 export interface Payment {
   id: string;
+  jobId?: string | null;
   customerId: string;
   amount: number;
   date: string;
+  mode?: PaymentMode;
   type: PaymentType;
+  reference?: string;
   linkedInvoiceId?: string | null;
   notes?: string;
   createdAt: string;

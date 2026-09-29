@@ -66,7 +66,11 @@ export function InvoiceForm({ initial, jobId }: { initial?: Invoice; jobId?: str
   });
 
   const suggestedNo = useMemo(
-    () => nextInvoiceNo(invoices.map((i) => i.invoiceNo), profile?.invoicePrefix ?? ""),
+    () =>
+      nextInvoiceNo(
+        invoices.map((i) => i.invoiceNo),
+        profile?.invoicePrefix ?? "",
+      ),
     [invoices, profile?.invoicePrefix],
   );
   const effectiveNo = invoiceNo || (initial ? initial.invoiceNo : suggestedNo);
@@ -94,11 +98,27 @@ export function InvoiceForm({ initial, jobId }: { initial?: Invoice; jobId?: str
       toast.error("Add at least one line item");
       return;
     }
-    if (!invoiceDate || !effectiveNo.trim() || items.some(i => !i.description.trim() || !Number.isFinite(i.quantity) || i.quantity <= 0 || !Number.isFinite(i.ratePerUnit) || i.ratePerUnit < 0) || !Number.isFinite(gstRate) || gstRate < 0 || gstRate > 100) {
-      toast.error("Check the date, descriptions, quantities, rates and GST rate"); return;
+    if (
+      !invoiceDate ||
+      !effectiveNo.trim() ||
+      items.some(
+        (i) =>
+          !i.description.trim() ||
+          !Number.isFinite(i.quantity) ||
+          i.quantity <= 0 ||
+          !Number.isFinite(i.ratePerUnit) ||
+          i.ratePerUnit < 0,
+      ) ||
+      !Number.isFinite(gstRate) ||
+      gstRate < 0 ||
+      gstRate > 100
+    ) {
+      toast.error("Check the date, descriptions, quantities, rates and GST rate");
+      return;
     }
-    if (invoices.some(i => i.id !== initial?.id && i.invoiceNo === effectiveNo.trim())) {
-      toast.error("Invoice number already exists"); return;
+    if (invoices.some((i) => i.id !== initial?.id && i.invoiceNo === effectiveNo.trim())) {
+      toast.error("Invoice number already exists");
+      return;
     }
     const half = (Number(gstRate) || 0) / 2;
     const payload: Omit<Invoice, "id"> = {
@@ -159,7 +179,11 @@ export function InvoiceForm({ initial, jobId }: { initial?: Invoice; jobId?: str
           </div>
           <div className="space-y-1.5">
             <Label>Invoice date</Label>
-            <Input type="date" value={invoiceDate} onChange={(e) => setInvoiceDate(e.target.value)} />
+            <Input
+              type="date"
+              value={invoiceDate}
+              onChange={(e) => setInvoiceDate(e.target.value)}
+            />
           </div>
           <div className="space-y-1.5">
             <Label>Customer</Label>
@@ -202,11 +226,17 @@ export function InvoiceForm({ initial, jobId }: { initial?: Invoice; jobId?: str
               <div className="grid gap-3 sm:grid-cols-12">
                 <div className="space-y-1.5 sm:col-span-4">
                   <Label className="text-xs">Description</Label>
-                  <Input value={it.description} onChange={(e) => setItem(i, { description: e.target.value })} />
+                  <Input
+                    value={it.description}
+                    onChange={(e) => setItem(i, { description: e.target.value })}
+                  />
                 </div>
                 <div className="space-y-1.5 sm:col-span-2">
                   <Label className="text-xs">HSN/SAC</Label>
-                  <Input value={it.hsnSacCode} onChange={(e) => setItem(i, { hsnSacCode: e.target.value })} />
+                  <Input
+                    value={it.hsnSacCode}
+                    onChange={(e) => setItem(i, { hsnSacCode: e.target.value })}
+                  />
                 </div>
                 <div className="space-y-1.5 sm:col-span-1">
                   <Label className="text-xs">Qty</Label>
@@ -285,7 +315,11 @@ export function InvoiceForm({ initial, jobId }: { initial?: Invoice; jobId?: str
           <h2 className="mb-4 font-display text-base font-semibold">Tax & totals</h2>
           <div className="mb-4 max-w-40 space-y-1.5">
             <Label className="text-xs">GST rate (%)</Label>
-            <Input type="number" value={gstRate} onChange={(e) => setGstRate(Number(e.target.value))} />
+            <Input
+              type="number"
+              value={gstRate}
+              onChange={(e) => setGstRate(Number(e.target.value))}
+            />
           </div>
           <dl className="space-y-2 text-sm">
             <Row label="Taxable value" value={totals.taxableValue} />
@@ -303,12 +337,17 @@ export function InvoiceForm({ initial, jobId }: { initial?: Invoice; jobId?: str
               <dd className="tnum">₹{formatINR(totals.totalAmount)}</dd>
             </div>
           </dl>
-          <p className="mt-3 text-xs italic text-muted-foreground">{amountInWords(totals.totalAmount)}</p>
+          <p className="mt-3 text-xs italic text-muted-foreground">
+            {amountInWords(totals.totalAmount)}
+          </p>
         </div>
       </section>
 
       <div className="flex flex-wrap gap-2">
-        <Button onClick={() => save(initial?.status ?? "Draft")} disabled={create.isPending || update.isPending}>
+        <Button
+          onClick={() => save(initial?.status ?? "Draft")}
+          disabled={create.isPending || update.isPending}
+        >
           {initial ? "Save changes" : "Save as draft"}
         </Button>
         {!initial && (

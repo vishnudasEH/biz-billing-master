@@ -1,0 +1,6 @@
+{
+  "name": "Balaji Wood Kraft - Job Work Orders & CNC Billing",
+  "description": "CNC router & wood job work orders, daily advance and cash collection, GST tax invoices and customer ledgers.",
+  "permissions": [],
+  "capabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

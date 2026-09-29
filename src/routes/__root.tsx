@@ -79,11 +79,19 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1, viewport-fit=cover" },
-      { title: "ShopLedger — Jobs, GST Invoices & Payments" },
-      { name: "description", content: "Job tracking, GST tax invoices and customer ledgers for a small fabrication shop." },
-      { name: "author", content: "ShopLedger" },
-      { property: "og:title", content: "ShopLedger" },
-      { property: "og:description", content: "Job tracking, GST tax invoices and customer ledgers." },
+      { title: "Balaji Wood Kraft — Job Work Orders & CNC Billing" },
+      {
+        name: "description",
+        content:
+          "Balaji Wood Kraft: Daily CNC wood job work orders, advance and cash collections, GST tax invoices and customer ledgers.",
+      },
+      { name: "author", content: "Balaji Wood Kraft" },
+      { property: "og:title", content: "Balaji Wood Kraft — Job Work Orders & CNC Billing" },
+      {
+        property: "og:description",
+        content:
+          "Daily CNC wood job work orders, advance and cash collections, GST tax invoices and customer ledgers.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "theme-color", content: "#1c2333" },

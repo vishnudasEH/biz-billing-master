@@ -214,3 +214,60 @@
     background: linear-gradient(90deg, var(--color-saffron), oklch(0.8 0.14 70));
   }
 }
+
+/* Dedicated Print Stylesheet for Job Work Order Bill */
+@media print {
+  html,
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+  }
+
+  body > *:not([data-radix-portal]) {
+    display: none !important;
+  }
+
+  [data-radix-portal] {
+    position: static !important;
+    display: block !important;
+    visibility: visible !important;
+  }
+
+  /* Hide modal overlay, close button, dialog header and footer in direct browser print */
+  [data-radix-dialog-overlay],
+  [data-radix-dialog-content] > button,
+  [data-radix-dialog-content] > div:first-child,
+  [data-radix-dialog-content] > div:last-child {
+    display: none !important;
+  }
+
+  [data-radix-dialog-content] {
+    position: static !important;
+    transform: none !important;
+    max-height: none !important;
+    overflow: visible !important;
+    border: none !important;
+    background: transparent !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  #printable-bill {
+    position: static !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 auto !important;
+    padding: 16px !important;
+    background: #ffffff !important;
+    box-shadow: none !important;
+    border: 2px solid #b99b7d !important;
+    overflow: visible !important;
+  }
+
+  @page {
+    size: A4 portrait;
+    margin: 8mm;
+  }
+}
