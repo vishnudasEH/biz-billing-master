@@ -1,7 +1,8 @@
-import { useMemo, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { useNavigate } from "@tanstack/react-router";
+import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Calendar, CheckSquare, FileText, Layers, Square } from "lucide-react";
+import { CheckSquare, FileText, Layers, Square } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -17,20 +18,22 @@ import { customersApi, invoicesApi, jobsApi, paymentsApi, useShopProfile } from 
 import {
   computeTotals,
   determineTaxType,
+  formatDate,
   formatINR,
   nextInvoiceNo,
   todayISO,
 } from "@/lib/invoice-calc";
-import type { Invoice, Job, LineItem } from "@/lib/types";
+import type { Invoice, LineItem } from "@/lib/types";
 
 export function MonthlyInvoiceDialog({ trigger }: { trigger?: ReactNode }) {
   const navigate = useNavigate();
+  const qc = useQueryClient();
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
 
   const { data: customers = [] } = customersApi.useList();
   const { data: jobs = [] } = jobsApi.useList();
-  const { data: invoices = [] } = invoicesApi.useList();
+  const { data: allInvoices = [] } = invoicesApi.useAllList();
   const { data: payments = [] } = paymentsApi.useList();
   const { data: shopProfile } = useShopProfile();
 
@@ -45,7 +48,14 @@ export function MonthlyInvoiceDialog({ trigger }: { trigger?: ReactNode }) {
   const [lineItemMode, setLineItemMode] = useState<"perJob" | "combined">("perJob");
   const [hsnCode, setHsnCode] = useState("998831");
   const [gstRate, setGstRate] = useState<number>(shopProfile?.defaultGstRate ?? 18);
+  const [gstTouched, setGstTouched] = useState(false);
   const [invoiceDate, setInvoiceDate] = useState(todayISO());
+
+  useEffect(() => {
+    if (!gstTouched && typeof shopProfile?.defaultGstRate === "number") {
+      setGstRate(shopProfile.defaultGstRate);
+    }
+  }, [shopProfile?.defaultGstRate, gstTouched]);
 
   // Filter customers - monthlyGstBilling highlighted
   const gstEligibleCustomers = useMemo(() => {
@@ -154,7 +164,7 @@ export function MonthlyInvoiceDialog({ trigger }: { trigger?: ReactNode }) {
       toast.error("Please select a customer");
       return;
     }
-    if (selectedJobIds.length === 0) {
+    if (selectedJobs.length === 0) {
       toast.error("Please select at least one completed job work order");
       return;
     }
@@ -162,10 +172,11 @@ export function MonthlyInvoiceDialog({ trigger }: { trigger?: ReactNode }) {
     setBusy(true);
     try {
       const suggestedNo = nextInvoiceNo(
-        invoices.map((i) => i.invoiceNo),
+        allInvoices.map((i) => i.invoiceNo),
         shopProfile?.invoicePrefix ?? "",
       );
       const half = (Number(gstRate) || 0) / 2;
+      const includedJobIds = selectedJobs.map((j) => j.id);
 
       const payload: Omit<Invoice, "id"> = {
         invoiceNo: suggestedNo,
@@ -183,11 +194,18 @@ export function MonthlyInvoiceDialog({ trigger }: { trigger?: ReactNode }) {
         roundOff: totals.roundOff,
         totalAmount: totals.totalAmount,
         status: "Draft",
+        jobIds: includedJobIds,
+        billingMonth: selectedMonth,
         notes: `Monthly invoice for ${selectedMonth} covering ${selectedJobs.length} job orders. Advances received: Rs. ${formatINR(paymentsReceived)}.`,
         createdAt: new Date().toISOString(),
+        isDeleted: false,
+        deletedAt: null,
       };
 
       const newInvoiceId = await createInvoice.mutateAsync(payload);
+      if (!newInvoiceId) {
+        throw new Error("Invoice was created without a valid record ID");
+      }
 
       // Link invoiceId to all included jobs so they cannot be billed again
       for (const job of selectedJobs) {
@@ -197,9 +215,18 @@ export function MonthlyInvoiceDialog({ trigger }: { trigger?: ReactNode }) {
         });
       }
 
+      // Ensure caches contain the saved invoice and updated jobs before navigating
+      qc.setQueryData<Invoice>(["invoices", newInvoiceId], { id: newInvoiceId, ...payload });
+      await Promise.all([
+        qc.invalidateQueries({ queryKey: ["invoices"] }),
+        qc.invalidateQueries({ queryKey: ["jobs"] }),
+      ]);
+
       toast.success(`Monthly Invoice ${suggestedNo} created for ${selectedJobs.length} jobs!`);
+      setSelectedCustomerId("");
+      setSelectedJobIds([]);
       setOpen(false);
-      navigate({ to: "/invoices/$id", params: { id: newInvoiceId } });
+      await navigate({ to: "/invoices/$id", params: { id: newInvoiceId } });
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Failed to create monthly invoice");
     } finally {
@@ -327,7 +354,8 @@ export function MonthlyInvoiceDialog({ trigger }: { trigger?: ReactNode }) {
                               {j.jobNo || "JW-order"} · {j.description || "Wood job work"}
                             </p>
                             <p className="text-[11px] text-muted-foreground">
-                              Date: {j.date} · {j.woodTypes?.join(", ") || "Wood"}
+                              Date: {formatDate(j.date || j.dateCreated)} ·{" "}
+                              {j.woodTypes?.join(", ") || "Wood"}
                             </p>
                           </div>
                         </div>
@@ -385,7 +413,10 @@ export function MonthlyInvoiceDialog({ trigger }: { trigger?: ReactNode }) {
                     type="number"
                     className="h-8 text-xs font-mono"
                     value={gstRate}
-                    onChange={(e) => setGstRate(Number(e.target.value))}
+                    onChange={(e) => {
+                      setGstTouched(true);
+                      setGstRate(Number(e.target.value));
+                    }}
                   />
                 </div>
                 <div>

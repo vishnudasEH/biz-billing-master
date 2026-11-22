@@ -60,12 +60,14 @@ const emptyItem = (slNo: number): JobItem => ({
 
 export function JobFormDialog({
   initial,
+  isDuplicate,
   trigger,
   open: controlledOpen,
   onOpenChange: setControlledOpen,
   onSaved,
 }: {
   initial?: Job;
+  isDuplicate?: boolean;
   trigger?: ReactNode;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
@@ -121,35 +123,64 @@ export function JobFormDialog({
     if (!open) return;
 
     if (initial) {
-      setJobNo(initial.jobNo || "");
-      setDate(initial.date || initial.dateCreated || todayISO());
-      setCustomerId(initial.customerId || "");
-      setCustomerName(initial.customerName || "");
-      setMobile(initial.mobile || "");
-      setCustomerSearch(initial.customerName || "");
-      setDesignFileId(initial.designFileId || "");
-      setWoodTypes(initial.woodTypes || []);
-      setWoodTypeOther(initial.woodTypeOther || "");
-      setMaterialSuppliedBy(initial.materialSuppliedBy || "Customer");
-      setItems(
-        initial.items?.length
-          ? initial.items
-          : [
-              {
-                ...emptyItem(1),
-                description: initial.description || "",
-                amount: initial.total || 0,
-              },
-            ],
-      );
-      setNotes(initial.notes || "");
-      setDeliveryDate(initial.deliveryDate || "");
-      setStatus(initial.status || "Received");
+      if (isDuplicate) {
+        const generated = nextJobNo(jobs);
+        setJobNo(generated);
+        setDate(todayISO());
+        setCustomerId(initial.customerId || "");
+        setCustomerName(initial.customerName || "");
+        setMobile(initial.mobile || "");
+        setCustomerSearch(initial.customerName || "");
+        setDesignFileId(initial.designFileId || "");
+        setWoodTypes(initial.woodTypes || ["MDF"]);
+        setWoodTypeOther(initial.woodTypeOther || "");
+        setMaterialSuppliedBy(initial.materialSuppliedBy || "Customer");
+        setItems(
+          (initial.items || []).length
+            ? (initial.items || []).map((it, idx) => ({
+                slNo: idx + 1,
+                description: it.description || "",
+                size: it.size || "",
+                amount: 0,
+              }))
+            : [emptyItem(1)],
+        );
+        setNotes(initial.notes || "");
+        setDeliveryDate("");
+        setStatus("Received");
+        setAdvance(0);
+        setPaymentMode("Cash");
+      } else {
+        setJobNo(initial.jobNo || "");
+        setDate(initial.date || initial.dateCreated || todayISO());
+        setCustomerId(initial.customerId || "");
+        setCustomerName(initial.customerName || "");
+        setMobile(initial.mobile || "");
+        setCustomerSearch(initial.customerName || "");
+        setDesignFileId(initial.designFileId || "");
+        setWoodTypes(initial.woodTypes || []);
+        setWoodTypeOther(initial.woodTypeOther || "");
+        setMaterialSuppliedBy(initial.materialSuppliedBy || "Customer");
+        setItems(
+          initial.items?.length
+            ? initial.items
+            : [
+                {
+                  ...emptyItem(1),
+                  description: initial.description || "",
+                  amount: initial.total || 0,
+                },
+              ],
+        );
+        setNotes(initial.notes || "");
+        setDeliveryDate(initial.deliveryDate || "");
+        setStatus(initial.status || "Received");
 
-      const existingAdvance = jobAdvance(initial.id, payments);
-      setAdvance(existingAdvance);
-      const existingPay = payments.find((p) => p.jobId === initial.id);
-      if (existingPay?.mode) setPaymentMode(existingPay.mode);
+        const existingAdvance = jobAdvance(initial.id, payments);
+        setAdvance(existingAdvance);
+        const existingPay = payments.find((p) => p.jobId === initial.id);
+        if (existingPay?.mode) setPaymentMode(existingPay.mode);
+      }
     } else {
       // New Job
       const generated = nextJobNo(jobs);
@@ -170,7 +201,7 @@ export function JobFormDialog({
       setAdvance(0);
       setPaymentMode("Cash");
     }
-  }, [open, initial, jobs, payments]);
+  }, [open, initial, isDuplicate, jobs, payments]);
 
   // Total calculation
   const total = useMemo(() => {
@@ -367,20 +398,21 @@ export function JobFormDialog({
         description: items[0]?.description || "Job Work",
       };
 
-      let currentJobId = initial?.id;
-      if (initial) {
-        await updateJob.mutateAsync({ id: initial.id, data: jobPayload });
-      } else {
+      const isNew = !initial || isDuplicate;
+      let currentJobId = isNew ? undefined : initial.id;
+      if (isNew) {
         currentJobId = await createJob.mutateAsync(jobPayload);
+      } else {
+        await updateJob.mutateAsync({ id: initial.id, data: jobPayload });
       }
 
       // Handle Advance Payment for both New AND Edit
       if (currentJobId) {
-        const existingPayments = payments.filter((p) => p.jobId === currentJobId);
+        const existingPayments = !isNew ? payments.filter((p) => p.jobId === currentJobId) : [];
         const existingAdvance =
           existingPayments.find((p) => p.type === "Advance") || existingPayments[0];
 
-        if (initial) {
+        if (!isNew) {
           if (existingAdvance) {
             if (advance > 0) {
               await updatePayment.mutateAsync({
@@ -413,7 +445,7 @@ export function JobFormDialog({
             });
           }
         } else {
-          // Newly created job with advance
+          // Newly created job (or duplicated job) with advance
           if (advance > 0) {
             await createPayment.mutateAsync({
               jobId: currentJobId,
@@ -437,12 +469,18 @@ export function JobFormDialog({
 
       const fullJob: Job = { id: currentJobId!, ...jobPayload };
       setSavedJobData(fullJob);
-      toast.success(initial ? "Job Work Order updated successfully!" : "Job Work Order created!");
+      toast.success(
+        isDuplicate
+          ? "Job duplicated and created successfully!"
+          : initial
+            ? "Job Work Order updated successfully!"
+            : "Job Work Order created!",
+      );
       setOpen(false);
       onSaved?.(fullJob);
 
       // Offer immediate print modal if newly created
-      if (!initial) {
+      if (isNew) {
         setSavedSuccessModal(true);
       }
     } catch (err) {
@@ -461,17 +499,25 @@ export function JobFormDialog({
             <div className="flex flex-wrap items-center justify-between gap-2">
               <div>
                 <DialogTitle className="text-lg font-bold font-display flex items-center gap-2">
-                  <span>{initial ? "Edit Job Work Order" : "New Job Work Order"}</span>
+                  <span>
+                    {isDuplicate
+                      ? "Duplicate Job Work Order"
+                      : initial
+                        ? "Edit Job Work Order"
+                        : "New Job Work Order"}
+                  </span>
                   <span className="rounded bg-amber-100 dark:bg-amber-950/60 px-2 py-0.5 text-xs font-mono font-bold text-amber-900 dark:text-amber-200">
                     {jobNo || "JW-"}
                   </span>
                 </DialogTitle>
                 <p className="text-xs text-muted-foreground mt-0.5">
-                  Balaji Wood Kraft · CNC & Wood Job Work Slip
+                  {isDuplicate
+                    ? "Review and adjust duplicate job specifications before creating"
+                    : "Balaji Wood Kraft · CNC & Wood Job Work Slip"}
                 </p>
               </div>
 
-              {!initial && (
+              {(!initial || isDuplicate) && (
                 <Button
                   type="button"
                   variant="outline"

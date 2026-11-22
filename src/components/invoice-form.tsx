@@ -28,10 +28,19 @@ const emptyItem = (slNo: number): LineItem => ({
   amount: 0,
 });
 
-export function InvoiceForm({ initial, jobId }: { initial?: Invoice; jobId?: string | undefined }) {
+export function InvoiceForm({
+  initial,
+  jobId,
+  onSaved,
+}: {
+  initial?: Invoice;
+  jobId?: string | undefined;
+  onSaved?: () => void;
+}) {
   const navigate = useNavigate();
   const { data: customers = [] } = customersApi.useList();
   const { data: invoices = [] } = invoicesApi.useList();
+  const { data: allInvoices = [] } = invoicesApi.useAllList();
   const { data: jobs = [] } = jobsApi.useList();
   const { data: profile } = useShopProfile();
   const create = invoicesApi.useCreate();
@@ -68,10 +77,10 @@ export function InvoiceForm({ initial, jobId }: { initial?: Invoice; jobId?: str
   const suggestedNo = useMemo(
     () =>
       nextInvoiceNo(
-        invoices.map((i) => i.invoiceNo),
+        allInvoices.map((i) => i.invoiceNo),
         profile?.invoicePrefix ?? "",
       ),
-    [invoices, profile?.invoicePrefix],
+    [allInvoices, profile?.invoicePrefix],
   );
   const effectiveNo = invoiceNo || (initial ? initial.invoiceNo : suggestedNo);
 
@@ -139,7 +148,11 @@ export function InvoiceForm({ initial, jobId }: { initial?: Invoice; jobId?: str
       totalAmount: totals.totalAmount,
       status,
       jobId: initial?.jobId ?? jobId ?? null,
+      ...(initial?.jobIds ? { jobIds: initial.jobIds } : {}),
+      ...(initial?.billingMonth ? { billingMonth: initial.billingMonth } : {}),
       createdAt: initial?.createdAt ?? new Date().toISOString(),
+      isDeleted: initial?.isDeleted ?? false,
+      deletedAt: initial?.deletedAt ?? null,
     };
 
     if (initial) {
@@ -148,7 +161,11 @@ export function InvoiceForm({ initial, jobId }: { initial?: Invoice; jobId?: str
         {
           onSuccess: () => {
             toast.success("Invoice updated");
-            navigate({ to: "/invoices/$id", params: { id: initial.id } });
+            if (onSaved) {
+              onSaved();
+            } else {
+              navigate({ to: "/invoices/$id", params: { id: initial.id } });
+            }
           },
           onError: (e) => toast.error(e instanceof Error ? e.message : "Save failed"),
         },
@@ -253,8 +270,15 @@ export function InvoiceForm({ initial, jobId }: { initial?: Invoice; jobId?: str
                     value={it.unit}
                     onChange={(e) => setItem(i, { unit: e.target.value })}
                   >
+                    {!UNITS.includes(it.unit) && it.unit && (
+                      <option key={it.unit} value={it.unit}>
+                        {it.unit}
+                      </option>
+                    )}
                     {UNITS.map((u) => (
-                      <option key={u}>{u}</option>
+                      <option key={u} value={u}>
+                        {u}
+                      </option>
                     ))}
                   </select>
                 </div>

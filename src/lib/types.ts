@@ -121,8 +121,12 @@ export interface Invoice {
   totalAmount: number;
   status: InvoiceStatus;
   jobId?: string | null;
+  jobIds?: string[];
+  billingMonth?: string;
   notes?: string;
   createdAt: string;
+  isDeleted?: boolean;
+  deletedAt?: string | null;
 }
 
 export type PaymentMode = "Bank" | "GPay" | "Cash";
@@ -141,6 +145,25 @@ export interface Payment {
   notes?: string;
   createdAt: string;
 }
+
+export interface Expense {
+  id: string;
+  date: string; // YYYY-MM-DD
+  category: string;
+  amount: number;
+  notes?: string;
+  createdAt: string;
+}
+
+export const EXPENSE_CATEGORIES = [
+  "Material",
+  "Wages",
+  "Rent",
+  "Transport",
+  "Power / Electricity",
+  "Tools & Maintenance",
+  "Other",
+] as const;
 
 export const INDIAN_STATES: { name: string; code: string }[] = [
   { name: "Andaman and Nicobar Islands", code: "35" },
@@ -181,4 +204,4 @@ export const INDIAN_STATES: { name: string; code: string }[] = [
   { name: "West Bengal", code: "19" },
 ];
 
-export const UNITS = ["Nos", "Kg", "Mtr", "Sq.Ft", "Set", "Pcs", "Hrs", "Lot"];
+export const UNITS = ["Nos", "Job", "Kg", "Mtr", "Sq.Ft", "Set", "Pcs", "Hrs", "Lot"];
